@@ -62,19 +62,24 @@
             "Fn::Join": [
               "",
               [
-                "137112412989.dkr.ecr.",
+                {
+                  "Ref": "AWS::AccountId"
+                },
+                ".dkr.ecr.",
                 {
                   "Ref": "AWS::Region"
                 },
-                ".amazonaws.com/amazonlinux:latest"
+                ".amazonaws.com/batch-repo:latest"
               ]
             ]
           },
-          "Vcpus": 1,
-          "Memory": 1000,
+          "Vcpus": 2,
+          "Memory": 2000,
           "Command": [
-            "echo",
-            "Hello world"
+            "node",
+            "index.js",
+            "--customer",
+            "Ref::customer"
           ]
         },
         "RetryStrategy": {
@@ -104,8 +109,10 @@
           "Type": "EC2",
           "MinvCpus": 0,
           "DesiredvCpus": 0,
-          "MaxvCpus": 1,
-          "InstanceTypes": "t2.micro",
+          "MaxvCpus": 64,
+          "InstanceTypes": [
+            "optimal"
+          ],
           "Subnets": [
             "subnet-04024879",
             "subnet-07f2ac4a",
@@ -121,6 +128,28 @@
         "ServiceRole": {
           "Ref": "BatchServiceRole"
         }
+      }
+    },
+    "CustomerTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "1",
+          "WriteCapacityUnits": "1"
+        },
+        "TableName": "batch.customer"
       }
     }
   },

@@ -7,5 +7,3 @@ COPY ./package-lock.json /usr/app/package-lock.json
 COPY . /usr/app
 
 RUN npm install
-
-CMD [ "node", "index.js" ]

@@ -1,7 +1,11 @@
-const CUSTOMER_ARG = '-customer=';
+const CUSTOMER_ARG = '--customer';
 const getInvoiceIdArg = (args) => {
-  const invoiceIdArg = args.find(arg => arg.startsWith(CUSTOMER_ARG)) || CUSTOMER_ARG;
-  return invoiceIdArg.substring(CUSTOMER_ARG.length);
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === CUSTOMER_ARG && i < args.length - 1) {
+      return args[i + 1];
+    }
+  }
+  return undefined;
 };
 
 const customerId = getInvoiceIdArg(process.argv);
