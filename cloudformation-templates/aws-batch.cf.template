@@ -1,6 +1,10 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "AWS CloudFormation Sample Template Managed Single Batch Job Queue: This template demonstrates the usage of simple Job Queue and ECS style Compute Environment.",
+  "DestinationS3BucketParam": {
+    "Type": "String",
+    "Description": "Enter the S3 bucket name where the generated invoices will be stored"
+  },
   "Resources": {
     "BatchServiceRole": {
       "Type": "AWS::IAM::Role",
@@ -50,6 +54,77 @@
         },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+        ]
+      }
+    },
+    "EcsTaskRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "BatchJobRolePolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        ":",
+                        [
+                          {
+                            "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}"
+                          },
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          "table/batch.customer"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          {
+                            "Fn::Sub": "arn:aws:s3:::"
+                          },
+                          {
+                            "Ref": "DestinationS3BucketParam"
+                          },
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
         ]
       }
     },
