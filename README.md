@@ -18,3 +18,12 @@ What I don't like about using AWS Batch:
 - the console looks unfinished, a bit hard to get anything useful out there
 - even got a few issues with the jobs stuck in "RUNNABLE" status, but Batch console didn't provide any insights into what could be the issue
 - AWS Batch is providing a wrapping over a couple of other services (e.g. EC2, ECS, SQS) but you still need to be aware of what is under the hood in order to do your job
+- just too hard to understand why is not starting a new instance?? the console is telling absolutely nothing, you can only see that a job is stuck in runnable state, nothing more.
+
+
+Whenever you change something to the code, you could use the following bash script to rebuild the Docker image and push it to ECR repository (assuming you creates one already):
+```
+> ./build_and_push_image.sh batch-job alex
+```
+First argument: the name of the ECR repository.
+Second argument: AWS profile to be used. If not provided, then the default profile will be used.

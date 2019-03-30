@@ -1,9 +1,11 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "AWS CloudFormation Sample Template Managed Single Batch Job Queue: This template demonstrates the usage of simple Job Queue and ECS style Compute Environment.",
-  "DestinationS3BucketParam": {
-    "Type": "String",
-    "Description": "Enter the S3 bucket name where the generated invoices will be stored"
+  "Parameters": {
+    "DestinationS3BucketParam": {
+      "Type": "String",
+      "Description": "Enter the S3 bucket name where the generated invoices will be stored"
+    }
   },
   "Resources": {
     "BatchServiceRole": {
@@ -144,7 +146,7 @@
                 {
                   "Ref": "AWS::Region"
                 },
-                ".amazonaws.com/batch-repo:latest"
+                ".amazonaws.com/batch-job:latest"
               ]
             ]
           },
@@ -155,7 +157,18 @@
             "index.js",
             "--customer",
             "Ref::customer"
-          ]
+          ],
+          "Environment": [
+            {
+              "Name": "DESTINATION_BUCKET",
+              "Value": {
+                "Ref": "DestinationS3BucketParam"
+              }
+            }
+          ],
+          "JobRoleArn": {
+            "Ref": "EcsTaskRole"
+          }
         },
         "RetryStrategy": {
           "Attempts": 1
